@@ -1,22 +1,24 @@
 # Ore Editorial — OJS plugin
 
-Adds editorial-workflow nudges to OJS. Currently ships one feature: a notice
-that appears above the Round Status when peer-review recommendations indicate
-the article meets criteria for acceptance but no Version of Record has been
-published yet.
+A small plugin tailored to the ORE (Open Research Europe) overlay-journal
+workflow. It alerts editors on the Review Stage as soon as the round has
+gathered enough confirmed reviewer recommendations to justify creating a
+Version of Record, so the next editorial step doesn't get overlooked.
 
 ## When the notice shows
 
-In the editor view of the workflow modal, on the *Internal Review* or
-*External Review* stage, when **all** of the following hold:
+The notice renders above the Round Status panel in the editor's workflow
+view, on the *Internal Review* or *External Review* stage, when **all** of
+the following hold:
 
-- At least 2 reviews in the current round are confirmed by the editor (status
-  `COMPLETE` or `THANKED`) with reviewer recommendation type **APPROVED**, **or**
-  at least 1 APPROVED plus 2 with type **REVISIONS_REQUESTED**.
-- No publication on the submission has `versionStage === 'VoR'` and is
-  published. Once a Version of Record is published, the notice disappears.
+- The current round has at least 2 confirmed reviews (status `COMPLETE` or
+  `THANKED`) recommending **APPROVED**, or at least 1 APPROVED together
+  with 2 recommending **REVISIONS_REQUESTED**.
+- No publication on the submission is yet published with
+  `versionStage = 'VoR'`. Once the Version of Record exists the notice
+  goes away on its own.
 
-Author-side workflow views never show the notice.
+The author view of the workflow never shows the notice.
 
 ## Requirements
 
