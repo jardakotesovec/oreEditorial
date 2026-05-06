@@ -20,10 +20,7 @@ Author-side workflow views never show the notice.
 
 ## Requirements
 
-- OJS 3.6 or later (uses the JS hook system introduced in 3.5/3.6).
-- A patched `lib/pkp` that exposes `reviewerRecommendationType` on each
-  reviewer assignment in the submission API payload. The patch is small —
-  see the *Core dependency* section below.
+OJS 3.6 or later (uses the JS hook system introduced in 3.5/3.6).
 
 ## Installation
 
@@ -31,22 +28,6 @@ Drop this repo into `plugins/generic/oreEditorial/` of your OJS installation
 (as a submodule or a plain clone). The repo already includes the built JS/CSS
 under `public/build/`, so no `npm install`/`npm run build` step is required
 to use it. Then enable **Ore Editorial** under *Settings → Website → Plugins*.
-
-## Core dependency
-
-This plugin depends on the submission payload exposing the reviewer
-recommendation *type* (not just the ID). Two small additions in
-`lib/pkp` make this available:
-
-- `lib/pkp/schemas/reviewAssignment.json` — adds a `reviewerRecommendationType`
-  property next to `reviewerRecommendationId`.
-- `lib/pkp/classes/submission/maps/Schema.php` and
-  `lib/pkp/classes/submission/reviewAssignment/maps/Schema.php` — populate
-  it with a memoized `[id => type]` lookup against the context's
-  `ReviewerRecommendation` records.
-
-Without those changes the plugin loads but never triggers (no
-`reviewerRecommendationType` on review assignments). Upstream PR pending.
 
 ## Development
 
