@@ -1,3 +1,5 @@
 [
+  "common.status",
+  "notification.type.roundStatusTitle",
   "plugins.generic.oreEditorial.criteriaMet"
 ]

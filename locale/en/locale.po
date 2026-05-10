@@ -18,4 +18,4 @@ msgid "plugins.generic.oreEditorial.description"
 msgstr "Adds editorial-workflow nudges, starting with a notice when peer review criteria appear to be met but no Version of Record is published."
 
 msgid "plugins.generic.oreEditorial.criteriaMet"
-msgstr "Review criteria are met — Version of Record needs to be published."
+msgstr "The peer review threshold for Version of Record has been reached. Publish the submission as the Version of Record."

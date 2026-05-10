@@ -2,6 +2,39 @@ import OreReviewCriteriaMet from './Components/OreReviewCriteriaMet.vue';
 
 pkp.registry.registerComponent('OreReviewCriteriaMet', OreReviewCriteriaMet);
 
+// ReviewerRecommendationType enum values (see lib/pkp/.../enums/ReviewerRecommendationType.php)
+const TYPE_APPROVED = 1;
+const TYPE_REVISIONS_REQUESTED = 3;
+
+// ReviewAssignment::REVIEW_ASSIGNMENT_STATUS_COMPLETE / _THANKED — "confirmed by editor"
+const CONFIRMED_STATUSES = [8, 9];
+
+function shouldReplaceStatus(submission, selectedReviewRoundId) {
+	if (!selectedReviewRoundId) return false;
+
+	const vorPublished = (submission?.publications ?? []).some(
+		(pub) =>
+			pub.versionStage === 'VoR' &&
+			pub.status === pkp.const.publication.STATUS_PUBLISHED,
+	);
+	if (vorPublished) return false;
+
+	let approved = 0;
+	let revisionsRequested = 0;
+	for (const ra of submission?.reviewAssignments ?? []) {
+		if (ra.roundId !== selectedReviewRoundId) continue;
+		if (!CONFIRMED_STATUSES.includes(ra.statusId)) continue;
+
+		if (ra.reviewerRecommendationType === TYPE_APPROVED) {
+			approved++;
+		} else if (ra.reviewerRecommendationType === TYPE_REVISIONS_REQUESTED) {
+			revisionsRequested++;
+		}
+	}
+
+	return approved >= 2 || (approved >= 1 && revisionsRequested >= 2);
+}
+
 pkp.registry.storeExtend('workflow', (piniaContext) => {
 	const dashboardStore = pkp.registry.getPiniaStore('dashboard');
 	if (dashboardStore?.dashboardPage !== 'editorialDashboard') {
@@ -23,23 +56,25 @@ pkp.registry.storeExtend('workflow', (piniaContext) => {
 			return items;
 		}
 
-		const notice = {
-			component: 'OreReviewCriteriaMet',
-			props: {
-				submission: args.submission,
-				selectedReviewRoundId: args.selectedReviewRound?.id ?? null,
-			},
-		};
+		if (!shouldReplaceStatus(args.submission, args.selectedReviewRound?.id)) {
+			return items;
+		}
 
-		// Insert directly above the Round Status, i.e. just below the language
-		// selector. Fall back to prepending if WorkflowSubmissionStatus isn't
-		// present for some reason.
 		const statusIndex = items.findIndex(
 			(item) => item.component === 'WorkflowSubmissionStatus',
 		);
-		const insertAt = statusIndex === -1 ? 0 : statusIndex;
+		if (statusIndex === -1) {
+			return items;
+		}
+
 		const result = [...items];
-		result.splice(insertAt, 0, notice);
+		result[statusIndex] = {
+			component: 'OreReviewCriteriaMet',
+			props: {
+				submission: args.submission,
+				roundNumber: args.selectedReviewRound?.round ?? null,
+			},
+		};
 		return result;
 	});
 });
